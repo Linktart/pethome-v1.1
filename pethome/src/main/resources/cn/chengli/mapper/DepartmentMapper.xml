@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.chengli.mapper.DepartmentMapper">
+    <insert id="save">
+        insert into t_department (sn, name, state, manager_id, parent_id)
+        values (#{sn},
+                #{name},
+                #{state},
+                #{managerId},
+                #{parentId})
+    </insert>
+    <update id="update">
+        update t_department
+        set name       = #{name},
+            sn = #{sn},
+            state      = #{state},
+            manager_id = #{managerId},
+            parent_id  = #{parentId}
+        where id = #{id}
+    </update>
+    <delete id="delete">
+        delete
+        from t_department
+        where id = #{id};
+    </delete>
+    <delete id="batchdelete">
+        delete
+        from t_department
+        where id in
+        <foreach collection="userIds" separator="," item="t" close=")" open="(">
+            #{t}
+        </foreach>
+    </delete>
+    <select id="findAll" resultType="cn.chengli.domain.TDepartment">
+        select *
+        from t_department
+    </select>
+    <select id="queryPage" resultType="cn.chengli.domain.TDepartment">
+        select t.id, t.sn, t.name, t.state,t.manager_id, t.parent_id,(select td.name from t_department td where td.id = t.parent_id) parentName,
+        (select te.username from t_employee te where id = t.manager_id) managerName
+        from t_department t
+        <where>
+            <if test="name != null and name != '' ">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="state != null and state.toString() != '' ">
+                and state = #{state}
+            </if>
+            <if test="parentId != null and parentId.toString() != '' ">
+                and parent_id = #{parentId}
+            </if>
+        </where>
+
+    </select>
+    <select id="findByParentId" resultType="cn.chengli.domain.TDepartment">
+        select *
+        from t_department
+        where parent_id = #{parentId}
+    </select>
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.chengli.mapper.EmployeeMapper">
+    <delete id="batchdelete">
+        delete
+        from t_employee
+        where id in
+        <foreach collection="userIds" separator="," item="t" close=")" open="(">
+            #{t}
+        </foreach>
+    </delete>
+    <insert id="save">
+        insert into t_employee (username, email, phone, password, age, state)
+        values (
+                    #{username},
+                    #{email},
+                    #{phone},
+                    #{password},
+                    #{age},
+                    #{state})
+    </insert>
+    <update id="update">
+        update t_employee
+        set
+            username = #{username}
+          , email = #{email}
+          , phone = #{phone}
+          , password = #{password}
+          , age = #{age}
+          , state = #{state}
+        where id = #{id}
+    </update>
+    <delete id="delete">
+        delete
+        from t_employee
+        where id = #{id};
+    </delete>
+
+    <select id="findAll" resultType="cn.chengli.domain.TEmployee">
+        select *
+        from t_employee
+    </select>
+    <select id="queryPage" resultType="cn.chengli.domain.TEmployee">
+        select *
+        from t_employee
+        <where>
+            <if test="username != null and username.toString() != '' ">
+                and username like concat('%',#{username},'%')
+            </if>
+            <if test="state != null and state.toString() != '' ">
+                and state = #{state}
+            </if>
+            <if test="phone != null and phone.toString() != '' ">
+                and phone like concat('%',#{phone},'%')
+            </if>
+        </where>
+    </select>
+    <select id="findAllNameAndIdAndPhone" resultType="cn.chengli.domain.TEmployee">
+        select username,id,phone
+        from t_employee
+    </select>
+</mapper>
